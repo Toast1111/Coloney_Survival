@@ -9,6 +9,7 @@ class Game {
         
         // Game state
         this.resources = { food: 100, wood: 50, stone: 25, population: 3 };
+        this.lastResources = { ...this.resources }; // Track previous values for animations
         this.maxPopulation = 3;
         this.currentWave = 1;
         this.waveTimer = 60;
@@ -174,13 +175,28 @@ class Game {
     }
     
     drawGrid() {
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-        this.ctx.lineWidth = 1;
+        // Enhanced grid with subtle animation
+        const pulseIntensity = 0.05 + 0.02 * Math.sin(this.gameTime * 0.5);
+        this.ctx.strokeStyle = `rgba(255, 255, 255, ${0.08 + pulseIntensity})`;
+        this.ctx.lineWidth = 0.5;
+        
+        // Major grid lines every 4th line
+        const majorLineInterval = this.gridSize * 4;
         
         for (let x = 0; x <= this.canvas.width; x += this.gridSize) {
             this.ctx.beginPath();
             this.ctx.moveTo(x, 0);
             this.ctx.lineTo(x, this.canvas.height);
+            
+            // Make every 4th line slightly more prominent
+            if (x % majorLineInterval === 0) {
+                this.ctx.strokeStyle = `rgba(255, 255, 255, ${0.15 + pulseIntensity})`;
+                this.ctx.lineWidth = 1;
+            } else {
+                this.ctx.strokeStyle = `rgba(255, 255, 255, ${0.08 + pulseIntensity})`;
+                this.ctx.lineWidth = 0.5;
+            }
+            
             this.ctx.stroke();
         }
         
@@ -188,6 +204,16 @@ class Game {
             this.ctx.beginPath();
             this.ctx.moveTo(0, y);
             this.ctx.lineTo(this.canvas.width, y);
+            
+            // Make every 4th line slightly more prominent
+            if (y % majorLineInterval === 0) {
+                this.ctx.strokeStyle = `rgba(255, 255, 255, ${0.15 + pulseIntensity})`;
+                this.ctx.lineWidth = 1;
+            } else {
+                this.ctx.strokeStyle = `rgba(255, 255, 255, ${0.08 + pulseIntensity})`;
+                this.ctx.lineWidth = 0.5;
+            }
+            
             this.ctx.stroke();
         }
     }
@@ -202,19 +228,43 @@ class Game {
         const canPlace = this.canPlaceBuilding(gridX, gridY);
         
         this.ctx.save();
-        this.ctx.globalAlpha = 0.7;
-        this.ctx.fillStyle = canPlace ? 'rgba(0, 255, 0, 0.3)' : 'rgba(255, 0, 0, 0.3)';
-        this.ctx.fillRect(gridX, gridY, this.gridSize, this.gridSize);
         
-        this.ctx.font = `${this.gridSize * 0.6}px Arial`;
+        // Enhanced preview with pulse animation
+        const pulseIntensity = 0.1 + 0.05 * Math.sin(this.gameTime * 4);
+        this.ctx.globalAlpha = 0.6 + pulseIntensity;
+        
+        // Better background with border
+        if (canPlace) {
+            this.ctx.fillStyle = 'rgba(34, 197, 94, 0.4)'; // Nice green
+            this.ctx.strokeStyle = 'rgba(34, 197, 94, 0.8)';
+        } else {
+            this.ctx.fillStyle = 'rgba(239, 68, 68, 0.4)'; // Nice red
+            this.ctx.strokeStyle = 'rgba(239, 68, 68, 0.8)';
+        }
+        
+        this.ctx.fillRect(gridX, gridY, this.gridSize, this.gridSize);
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(gridX, gridY, this.gridSize, this.gridSize);
+        
+        // Building emoji with subtle animation
+        const emojiScale = 1 + pulseIntensity * 0.1;
+        this.ctx.font = `${this.gridSize * 0.6 * emojiScale}px Arial`;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
-        this.ctx.fillStyle = 'white';
+        this.ctx.fillStyle = canPlace ? '#ffffff' : '#ffeeee';
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeText(
+            type.emoji,
+            gridX + this.gridSize / 2,
+            gridY + this.gridSize / 2
+        );
         this.ctx.fillText(
             type.emoji,
             gridX + this.gridSize / 2,
             gridY + this.gridSize / 2
         );
+        
         this.ctx.restore();
     }
     
@@ -249,6 +299,15 @@ class Game {
         
         // Create building
         this.buildings.push(new Building(gridX, gridY, this.selectedBuilding, type));
+        
+        // Add building placement particles
+        for (let i = 0; i < 5; i++) {
+            this.particles.push(new Particle(
+                gridX + this.gridSize / 2 + (Math.random() - 0.5) * this.gridSize,
+                gridY + this.gridSize / 2 + (Math.random() - 0.5) * this.gridSize,
+                '✨', 1.5, '#22c55e', 'explosion'
+            ));
+        }
         
         // Clear selection
         this.selectedBuilding = null;
@@ -302,14 +361,19 @@ class Game {
     }
     
     updateUI() {
-        document.getElementById('food').textContent = Math.floor(this.resources.food);
-        document.getElementById('wood').textContent = Math.floor(this.resources.wood);
-        document.getElementById('stone').textContent = Math.floor(this.resources.stone);
+        // Animate resource changes
+        this.animateResourceChange('food', Math.floor(this.resources.food));
+        this.animateResourceChange('wood', Math.floor(this.resources.wood));
+        this.animateResourceChange('stone', Math.floor(this.resources.stone));
+        
         document.getElementById('population').textContent = `${this.colonists.length}/${this.maxPopulation}`;
         document.getElementById('currentWave').textContent = this.currentWave;
         document.getElementById('waveTimer').textContent = Math.ceil(this.waveTimer);
         
-        // Update build button states
+        // Update lastResources for next frame
+        this.lastResources = { ...this.resources };
+        
+        // Update build button states with enhanced visual feedback
         document.querySelectorAll('.build-btn').forEach(btn => {
             const buildingType = btn.dataset.building;
             const type = this.buildingTypes[buildingType];
@@ -322,8 +386,59 @@ class Game {
                 }
             }
             
+            const wasDisabled = btn.disabled;
             btn.disabled = !canAfford;
+            
+            // Add visual feedback when affordability changes
+            if (wasDisabled && !btn.disabled) {
+                btn.classList.add('newly-affordable');
+                setTimeout(() => btn.classList.remove('newly-affordable'), 500);
+            }
         });
+    }
+    
+    animateResourceChange(resourceType, newValue) {
+        const element = document.getElementById(resourceType);
+        const currentValue = parseInt(element.textContent) || 0;
+        
+        if (currentValue !== newValue) {
+            element.classList.add('updating');
+            
+            // Animate the number change
+            this.animateNumber(element, currentValue, newValue, 300);
+            
+            setTimeout(() => {
+                element.classList.remove('updating');
+            }, 500);
+        }
+    }
+    
+    animateNumber(element, start, end, duration) {
+        const startTime = performance.now();
+        const difference = end - start;
+        
+        const animate = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Use easing function for smooth animation
+            const easedProgress = this.easeOutCubic(progress);
+            const currentValue = Math.floor(start + (difference * easedProgress));
+            
+            element.textContent = currentValue;
+            
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                element.textContent = end;
+            }
+        };
+        
+        requestAnimationFrame(animate);
+    }
+    
+    easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
     }
     
     // Input handling methods
