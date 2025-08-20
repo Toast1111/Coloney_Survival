@@ -96,9 +96,9 @@ class Game {
         document.getElementById('speedBtn').addEventListener('click', () => this.toggleSpeed());
         document.getElementById('menuBtn').addEventListener('click', () => this.toggleBuildMenu());
         
-        // Prevent default touch behaviors
-        document.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
-        document.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+        // Prevent default touch behaviors only on canvas
+        this.canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+        this.canvas.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
     }
     
     spawnInitialColonists() {

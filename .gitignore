@@ -1,0 +1,25 @@
+# Development files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# Temporary files
+/tmp/
+*.tmp
+
+# Dependencies (if any)
+node_modules/
+npm-debug.log*
+
+# Build output (if any)
+dist/
+build/
