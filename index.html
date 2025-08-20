@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colony Survival</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="hud">
+            <div id="resources">
+                <div class="resource">
+                    <span class="resource-icon">🍖</span>
+                    <span id="food">100</span>
+                </div>
+                <div class="resource">
+                    <span class="resource-icon">🪵</span>
+                    <span id="wood">50</span>
+                </div>
+                <div class="resource">
+                    <span class="resource-icon">🪨</span>
+                    <span id="stone">25</span>
+                </div>
+                <div class="resource">
+                    <span class="resource-icon">👥</span>
+                    <span id="population">3</span>
+                </div>
+            </div>
+            <div id="buildMenu">
+                <button class="build-btn" data-building="house">🏠 House (10🪵)</button>
+                <button class="build-btn" data-building="farm">🌾 Farm (5🪵 3🪨)</button>
+                <button class="build-btn" data-building="lumberyard">🪓 Lumber (8🪵 5🪨)</button>
+                <button class="build-btn" data-building="quarry">⛏️ Quarry (10🪵 8🪨)</button>
+                <button class="build-btn" data-building="tower">🗼 Tower (15🪵 10🪨)</button>
+            </div>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <div id="gameInfo">
+            <div id="waveInfo">Wave: <span id="currentWave">1</span> | Next in: <span id="waveTimer">60</span>s</div>
+            <div id="gameStatus"></div>
+        </div>
+    </div>
+    
+    <div id="mobileControls">
+        <button id="pauseBtn">⏸️</button>
+        <button id="speedBtn">⏩</button>
+        <button id="menuBtn">📱</button>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
