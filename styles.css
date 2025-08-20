@@ -46,10 +46,53 @@ body {
     padding: 5px 10px;
     border-radius: 5px;
     font-weight: bold;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.resource:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .resource-icon {
     font-size: 18px;
+    animation: gentle-bounce 3s ease-in-out infinite;
+}
+
+@keyframes gentle-bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-1px);
+    }
+}
+
+.resource-value {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.resource-value.updating {
+    animation: resource-update 0.5s ease;
+}
+
+@keyframes resource-update {
+    0% {
+        transform: scale(1);
+        color: inherit;
+    }
+    50% {
+        transform: scale(1.2);
+        color: #22c55e;
+    }
+    100% {
+        transform: scale(1);
+        color: inherit;
+    }
 }
 
 #buildMenu {
@@ -66,31 +109,76 @@ body {
     border-radius: 5px;
     cursor: pointer;
     font-size: 12px;
-    transition: background 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .build-btn:hover {
     background: #2d3748;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .build-btn:active {
     background: #1a202c;
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: all 0.1s;
 }
 
 .build-btn.selected {
     background: #3182ce;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+    animation: pulse-blue 2s infinite;
+}
+
+.build-btn.newly-affordable {
+    animation: newly-affordable 0.5s ease;
+}
+
+@keyframes newly-affordable {
+    0% {
+        background: #22c55e;
+        transform: scale(1);
+    }
+    50% {
+        background: #16a34a;
+        transform: scale(1.05);
+    }
+    100% {
+        background: #4a5568;
+        transform: scale(1);
+    }
 }
 
 .build-btn:disabled {
     background: #718096;
     cursor: not-allowed;
     opacity: 0.6;
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+@keyframes pulse-blue {
+    0%, 100% {
+        box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 16px rgba(49, 130, 206, 0.5);
+    }
 }
 
 #gameCanvas {
     flex: 1;
-    background: #68d391;
+    background: linear-gradient(135deg, #68d391 0%, #48bb78 50%, #38a169 100%);
     cursor: crosshair;
+    transition: filter 0.3s ease;
+}
+
+#gameCanvas:hover {
+    filter: brightness(1.05);
 }
 
 #gameInfo {
@@ -121,15 +209,23 @@ body {
     border-radius: 50%;
     font-size: 20px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 #mobileControls button:hover {
     background: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 #mobileControls button:active {
     transform: scale(0.95);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.1s;
 }
 
 /* Mobile responsive adjustments */
